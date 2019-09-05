@@ -18,7 +18,7 @@ You need to compile (`mvn package`) and add the jar for the two following librar
 
 ## Running the code
 The code is tightly bound to the following workflow: 
-![Overview](https://raw.githubusercontent.com/pyvandenbussche/AnnotationQuery-pubmed/master/overview.png)
+![Alt text](overview.png?raw=true "Workflow overview")
 
 1. ParsePubtatorXML: Running this app will parse the list of PubMed article IDs we are interested in 
 (stored in `./data/keys`). and for each article query Pubtator and store the XML response in the `./data/xml` forlder.
