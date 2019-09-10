@@ -87,6 +87,36 @@ object Query extends App {
 
 
   /* ###############################
+    Example Q3: Cooccurrences of BRCA1 and BRCA2 with other genes in the same sentence
+  ################################## */
+
+  val cooc_brca1_annot = ContainedIn(FilterType(aqPUB,"gene"),Contains(FilterType(aqSCNLP,"sentence"), FilterProperty(aqPUB,"identifier","672")) )
+  // display(cooc_brca1_annot)
+  val cooc_brca1 = cooc_brca1_annot.select(Array("orig", "identifier").map(x => $"properties".getItem(x).alias(x)): _*)
+  println(cooc_brca1
+    .groupBy($"identifier")
+    .agg(
+      collect_set("orig") as "labels",
+      count("identifier").alias("count")
+    )
+    .orderBy(desc("count")).show(5)
+  )
+  println(cooc_brca1.count)
+
+  val cooc_brca2_annot = ContainedIn(FilterType(aqPUB,"gene"),Contains(FilterType(aqSCNLP,"sentence"), FilterProperty(aqPUB,"identifier","675")) )
+  // display(cooc_brca2_annot)
+  val cooc_brca2 = cooc_brca2_annot.select(Array("orig", "identifier").map(x => $"properties".getItem(x).alias(x)): _*)
+  println(cooc_brca2
+    .groupBy($"identifier")
+    .agg(
+      collect_set("orig") as "labels",
+      count("identifier").alias("count")
+    )
+    .orderBy(desc("count")).show(5)
+  )
+  println(cooc_brca2.count)
+
+  /* ###############################
   Distribution of documents per year
   ################################## */
 
@@ -132,36 +162,7 @@ println(abstract_genes
 println(abstract_genes.count)
 
 
-  /* ###############################
-  Cooccurrences of BRCA1 and BRCA2 with other genes in the same sentence
-  ################################## */
 
-// val cooc_brca1_annot = Contains(FilterType(aqSCNLP,"sentence"), FilterProperty(aqPUB,"identifier","672"))
-val cooc_brca1_annot = ContainedIn(FilterType(aqPUB,"gene"),Contains(FilterType(aqSCNLP,"sentence"), FilterProperty(aqPUB,"identifier","672")) )
-// display(cooc_brca1_annot)
-val cooc_brca1 = cooc_brca1_annot.select(Array("orig", "identifier").map(x => $"properties".getItem(x).alias(x)): _*)
-println(cooc_brca1
-  .groupBy($"identifier")
-  .agg(
-    collect_set("orig") as "labels",
-    count("identifier").alias("count")
-  )
-  .orderBy(desc("count")).show(5)
-)
-println(cooc_brca1.count)
-
-val cooc_brca2_annot = ContainedIn(FilterType(aqPUB,"gene"),Contains(FilterType(aqSCNLP,"sentence"), FilterProperty(aqPUB,"identifier","675")) )
-// display(cooc_brca2_annot)
-val cooc_brca2 = cooc_brca2_annot.select(Array("orig", "identifier").map(x => $"properties".getItem(x).alias(x)): _*)
-println(cooc_brca2
-  .groupBy($"identifier")
-  .agg(
-    collect_set("orig") as "labels",
-    count("identifier").alias("count")
-  )
-  .orderBy(desc("count")).show(5)
-)
-println(cooc_brca2.count)
 
   /* ###############################
   Cooccurrences of BRCA1 or BRCA2 with cell lines in the same sentence
