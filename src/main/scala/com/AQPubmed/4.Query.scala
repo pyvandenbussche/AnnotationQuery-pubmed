@@ -48,6 +48,45 @@ object Query extends App {
   println("Number of SCNLP annotations: " + aqSCNLP.count)
 
   /* ###############################
+    Example Q1 from the blog post
+    ################################## */
+
+  val q1_annot = ContainedIn(FilterType(aqPUB,"disease"),Contains(FilterType(aqOM,"title"), FilterProperty(aqPUB,"identifier",valueArr=Array("675","672")) ))
+
+  val q1 = q1_annot.select(Array("orig", "identifier").map(x => $"properties".getItem(x).alias(x)): _*)
+  println(q1
+    .groupBy($"identifier")
+    .agg(
+      collect_set("orig") as "labels",
+      count("identifier").alias("count")
+    )
+    .orderBy(desc("count")).show(5)
+  )
+
+  /* ###############################
+    Example Q2 from the blog post
+    ################################## */
+  val q2_annot = Or(
+    Before(FilterType(aqPUB,"cellline"),FilterProperty(aqPUB,"identifier",valueArr=Array("675","672")), 30),
+    After(FilterType(aqPUB,"cellline"),FilterProperty(aqPUB,"identifier",valueArr=Array("675","672")), 30)
+  )
+  val q2 = q2_annot.select(Array("orig", "identifier").map(x => $"properties".getItem(x).alias(x)): _*)
+  println(q2
+    .groupBy($"identifier")
+    .agg(
+      collect_set("orig") as "labels",
+      count("identifier").alias("count")
+    )
+    .orderBy(desc("count")).show(5)
+  )
+
+  /* ###############################
+      Example Concordancer of Q2
+   ################################## */
+  println(Concordancer(q2_annot,strMnt,5,60))
+
+
+  /* ###############################
   Distribution of documents per year
   ################################## */
 
@@ -154,9 +193,5 @@ println(hdratedAnnots.show(5))
 
 val concordancerResult = XMLConcordancer(cooc_brca_annot,strMnt,FilterType(aqPUB,"gene"),10)
   println(concordancerResult)
-
-// COMMAND ----------
-
-
 
 }
